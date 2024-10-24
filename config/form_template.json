@@ -1,0 +1,95 @@
+{
+    "questions": [
+      {
+        "question": "1. How are you feeling today?",
+        "description": "We'd love to know where you're at emotionally so we can better connect with you through art",
+        "options": [
+          "Energized and excited",
+          "Calm and content",
+          "A bit anxious or stressed",
+          "Feeling reflective",
+          "Something else (please share if you’d like)"
+        ]
+      },
+      {
+        "question": "2. Is there something specific that has been on your mind recently?",
+        "description": "This can help us suggest art that might resonate with your current experience",
+        "options": [
+          "Work or school responsibilities",
+          "Personal relationships",
+          "Health or well-being",
+          "The world around us (news, environment, etc.)",
+          "I’d rather not say",
+          "Other (please feel free to elaborate)"
+        ]
+      },
+      {
+        "question": "3. When you’re feeling stressed or anxious, what usually helps you feel better?",
+        "description": "This will guide us in finding artwork that comforts or inspires you",
+        "options": [
+          "Listening to music or watching films",
+          "Engaging with art (visual, writing, etc.)",
+          "Taking a break outdoors or spending time with loved ones",
+          "Reflecting quietly or meditating",
+          "Other (please share)"
+        ]
+      },
+      {
+        "question": "4. Are there specific themes in art that resonate with you during different moods?",
+        "description": "For example: nature, abstract, human connection, etc.",
+        "options": [
+          "Yes, I connect with certain themes (please list)",
+          "Not really, I’m open to exploring different themes"
+        ]
+      },
+      {
+        "question": "5. How do you prefer to spend your free time?",
+        "description": "This helps us understand your interests to recommend artworks you might enjoy",
+        "options": [
+          "Socializing or engaging with others",
+          "Alone time for hobbies or self-care",
+          "Exploring new ideas or creative projects",
+          "Other (please specify)"
+        ]
+      },
+      {
+        "question": "6. What’s something you’re passionate about right now?",
+        "description": "It could be a personal goal, a cause, or something simple that makes you happy",
+        "options": [
+          "[Open-ended field]"
+        ]
+      },
+      {
+        "question": "7. How would you describe your ideal social media experience?",
+        "options": [
+          "Fast-paced and full of updates",
+          "Slower, more meaningful, and reflective",
+          "A balance of both"
+        ]
+      },
+      {
+        "question": "8. Are you currently exploring any personal growth or wellness practices?",
+        "description": "This helps us understand what kind of emotional support or inspiration you might need",
+        "options": [
+          "Yes, I’m focusing on self-care or mindfulness",
+          "Not actively, but I’d like to",
+          "Not at the moment"
+        ]
+      },
+      {
+        "question": "9. What role does art play in your life?",
+        "description": "This will help us provide art that aligns with your engagement level",
+        "options": [
+          "It’s a big part of my life; I regularly seek out or create art",
+          "I enjoy it occasionally but don’t actively seek it out",
+          "I’m new to engaging with art"
+        ]
+      },
+      {
+        "question": "10. Is there anything else you’d like us to know about how you’d like to experience art on Tart?",
+        "options": [
+          "[Open-ended field]"
+        ]
+      }
+    ]
+  }
