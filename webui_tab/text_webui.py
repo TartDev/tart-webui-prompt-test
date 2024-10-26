@@ -3,7 +3,7 @@ import json
 import os
 import openai
 
-class MainWebUI:
+class TextWebUI:
     def __init__(self):
         self.components = []
         with open('config/form_template.json', 'r', encoding='utf-8') as f:
