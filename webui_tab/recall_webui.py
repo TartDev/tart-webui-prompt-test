@@ -19,9 +19,9 @@ class RecallWebUI:
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.model = AutoModel.from_pretrained(self.model_name).to(self.device)
 
-        json_files = [f for f in os.listdir('./image_path/') if f.endswith('.json')]
-        json_files.sort(key=lambda f: os.path.getmtime(os.path.join('./image_path/', f)))
-        self.file_selector = gr.Dropdown(choices=json_files, label="Select a prompt file", value=json_files[0])
+        self.json_files = [f for f in os.listdir('./image_path/') if f.endswith('.json')]
+        self.json_files.sort(key=lambda f: os.path.getmtime(os.path.join('./image_path/', f)))
+        self.file_selector = gr.Dropdown(choices=self.json_files, label="Select a prompt file", value=self.json_files[0],interactive=True)
         self.doc_offline_button = gr.Button("Doc offline")
 
         self.query_textbox = gr.Textbox(label="Query",value="")
@@ -29,9 +29,9 @@ class RecallWebUI:
         self.recall_button = gr.Button("Recall")
         self.image_gallery = gr.Gallery(label="Retrieved Images")  # 创建图像画廊
         
-        self.file_selector.change(self.update_file_selector, inputs=None, outputs=self.file_selector)
+        self.file_selector.change(self.update_file_selector, inputs=None, outputs=None)
 
-        self.doc_offline_button.click(self.insert_query, inputs=None, outputs=None)
+        self.doc_offline_button.click(self.insert_query, inputs=self.file_selector, outputs=None)
         self.recall_button.click(self.query_embeddings, inputs=[self.query_textbox,self.topk], outputs=self.image_gallery)
     
     def get_openai_embeddings(self, text):
@@ -46,31 +46,20 @@ class RecallWebUI:
         with torch.no_grad():
             outputs = self.model(**inputs)
         return outputs[0][:, 0].cpu().numpy()
-    def insert_query(self,key="summary",use_cache = False):
-        doc_list = self.load_file_content(self.file_selector.value)
+    def insert_query(self,file,key="summary",use_cache = False):
+        doc_list = self.load_file_content(file)
         if use_cache:
-            self.load_index(f"./index/{self.file_selector.value}")
+            self.load_index(f"./index/{file}")
             return
         else:
             for item in doc_list:
-                self.image_data.append(item['image_base64'])
+                self.image_data.append(item['image'])
                 self.index.add(self.get_embeddings(eval(item["json_data"])[key]))
     def query_embeddings(self, query, topk):
         query_embedding = self.get_embeddings(query)
         _, indices = self.index.search(query_embedding, int(topk))
-        
-        # 使用 indices 获取对应的 image_data
         retrieved_images = [self.image_data[i] for i in indices[0]]  # 假设 indices 是二维数组
-        
-        # 保存图像并返回路径
-        image_paths = []
-        for i, img in enumerate(retrieved_images):
-            image_path = f"./tmp/image_{i}.jpg"  # 定义保存路径
-            with open(image_path, "wb") as f:
-                f.write(base64.b64decode(img))  # 解码并保存图像
-            image_paths.append(image_path)  # 添加路径到列表
-        
-        return image_paths  # 返回图像路径列表
+        return retrieved_images  # 返回图像路径列表
     def load_file_content(self, selected_file):
         with open(f'./image_path/{selected_file}', 'r', encoding='utf-8') as f:
             return json.load(f)
@@ -86,6 +75,5 @@ class RecallWebUI:
             self.image_data = json.load(f)  # 从 JSON 文件加载图像数据
 
     def update_file_selector(self):
-        json_files = [f for f in os.listdir('./image_path/') if f.endswith('.json')]
-        json_files.sort(key=lambda f: os.path.getmtime(os.path.join('./image_path/', f)))
-        return json_files  # 返回更新后的文件列表
+        self.json_files = [f for f in os.listdir('./image_path/') if f.endswith('.json')]
+        self.json_files.sort(key=lambda f: os.path.getmtime(os.path.join('./image_path/', f)))
