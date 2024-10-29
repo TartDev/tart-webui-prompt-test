@@ -1,2 +1,6 @@
 gradio
 openai
+faiss-cpu
+transformers
+torch
+sentence-transformers

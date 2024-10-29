@@ -1,5 +1,6 @@
 import yaml
 
+from webui_tab.recall_webui import RecallWebUI
 from webui_tab.text_webui import TextWebUI
 from webui_tab.img_webui import ImgWebUI
 
@@ -23,6 +24,8 @@ def webui():
             TextWebUI()
         with gr.Tab('Image Prompt'):
             ImgWebUI()
+        with gr.Tab('Recall'):
+            RecallWebUI()
     interface.launch(inbrowser=True,share=False, server_name=config["webui"]["host"], server_port=config["webui"]["port"])
 
 

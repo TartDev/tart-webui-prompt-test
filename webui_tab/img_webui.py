@@ -5,6 +5,7 @@ import gradio as gr
 import json
 import os
 import openai
+from tqdm import tqdm
 
 class ImgWebUI:
     def __init__(self):
@@ -43,28 +44,41 @@ class ImgWebUI:
         return filename
     def generate_result(self,):
         res = []
-        for image in self.images:
-            image_base64 = self.encode_image_to_base64(image)
-            messages=[
-                {"role": "user", "content": image_base64}
-            ]
-            combined_input = f"{self.prompt_textbox.value}"
-            print(combined_input)
-            messages.append({"role": "user", "content": combined_input})
-            client = openai.OpenAI()
-            completion = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages
-            )
-            json_match = re.search(r'```json\n(.*?)\n```', completion.choices[0].message.content, re.DOTALL)
-            if json_match:
-                json_data = json_match.group(1)
-                print(json_data)  # 或者你可以将其返回或进一步处理
-            else:
-                print("未找到 JSON 数据")
-            res.append({"image":image,"json_data":json_data,"image_base64":image_base64,'content':completion.choices[0].message.content})
+        for image in tqdm(self.images):
+            try:
+                file_name = os.path.basename(image)
+                image_url = f"https://raw.githubusercontent.com/TartDev/tart-webui-prompt-test/refs/heads/main/image_path/{file_name}"
+                image_base64 = self.encode_image_to_base64(image)
+                combined_input = f"{self.prompt_textbox.value}"
+                messages = [
+                        {
+                            "role": "user",
+                            "content": [
+                                {"type": "text", "text": combined_input},  # 提示文本
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": image_url  # 使用 base64 编码的图片
+                                    }
+                                },
+                            ],
+                        }
+                    ]
+                client = openai.OpenAI()
+                completion = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages
+                )
+                json_match = re.search(r'```json\n(.*?)\n```', completion.choices[0].message.content, re.DOTALL)
+                if json_match:
+                    json_data = json_match.group(1)
+                else:
+                    print("未找到 JSON 数据")
+                res.append({"image":image,"json_data":json_data,"image_base64":image_base64,'content':completion.choices[0].message.content})
+            except Exception as e:
+                print(e)
         filename = self.save_json_data(res)
-        gr.Info("保存成功！文件名为：{}".format(filename))
+        gr.Info("保存成功！文件名为：{},成功生成信息{}条".format(filename,len(res)))
         return res[0]['json_data']
 
         
