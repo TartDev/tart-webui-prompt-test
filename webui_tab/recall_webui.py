@@ -1,4 +1,5 @@
 import base64
+from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModel
 import torch
 import re
@@ -19,8 +20,8 @@ class RecallWebUI:
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.model = AutoModel.from_pretrained(self.model_name).to(self.device)
 
-        self.json_files = [f for f in os.listdir('./image_path/') if f.endswith('.json')]
-        self.json_files.sort(key=lambda f: os.path.getmtime(os.path.join('./image_path/', f)))
+        self.json_files = [f for f in os.listdir('./result') if f.startswith('result_')]
+        self.json_files.sort(key=lambda f: os.path.getmtime(os.path.join('./result/', f)))
         self.file_selector = gr.Dropdown(choices=self.json_files, label="Select a prompt file", value=self.json_files[0],interactive=True)
         self.doc_offline_button = gr.Button("Doc offline")
 
@@ -52,17 +53,21 @@ class RecallWebUI:
             self.load_index(f"./index/{file}")
             return
         else:
-            for item in doc_list:
-                self.image_data.append(item['image'])
-                self.index.add(self.get_embeddings(eval(item["json_data"])[key]))
+            for item in tqdm(doc_list):
+                try:
+                    self.image_data.append("./image_path/"+item['image'])
+                    self.index.add(self.get_embeddings(json.loads(item["json_data"])[key]))
+                except Exception as e:
+                    pass
+        gr.Info(f"已插入{len(self.image_data)}条数据")
     def query_embeddings(self, query, topk):
         query_embedding = self.get_embeddings(query)
         _, indices = self.index.search(query_embedding, int(topk))
         retrieved_images = [self.image_data[i] for i in indices[0]]  # 假设 indices 是二维数组
         return retrieved_images  # 返回图像路径列表
     def load_file_content(self, selected_file):
-        with open(f'./image_path/{selected_file}', 'r', encoding='utf-8') as f:
-            return json.load(f)
+        with open(f'./result/{selected_file}', 'r', encoding='utf-8') as f:
+            return [json.loads(line) for line in f]
         
     def save_index(self, file_path="./"):
         faiss.write_index(self.index, file_path)  # 保存 FAISS 索引到文件
